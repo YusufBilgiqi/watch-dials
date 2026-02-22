@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Watch Dials — A Complete Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Josefin+Sans:wght@200;300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf8f3;--surface:#f3efe6;--card:#fff;
+  --border:rgba(80,60,20,.1);--border2:rgba(80,60,20,.18);
+  --ink:#1a1408;--text:#4a3c1c;--muted:#9a8a68;
+  --gold:#8a6820;--gold-light:#c8a030;--gold-dim:rgba(138,104,32,.1);
+  --copper:#9a4820;--copper-dim:rgba(154,72,32,.08);
+  --teal:#1a6058;--teal-dim:rgba(26,96,88,.08);
+  --navy:#1c2848;--navy-dim:rgba(28,40,72,.07);
+  --green:#2a5830;--green-dim:rgba(42,88,48,.08);
+  --sw:250px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{background:var(--bg);color:var(--text);font-family:'Cormorant Garamond',serif;line-height:1.75;font-weight:300;}
+
+/* ── TEXTURE OVERLAY ── */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5;}
+
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:var(--sw) 1fr;height:100vh;overflow:hidden;position:relative;z-index:1;}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--ink);display:flex;flex-direction:column;height:100vh;overflow-y:auto;}
+.sb-brand{padding:26px 22px 20px;border-bottom:1px solid rgba(255,255,255,.06);}
+.sb-eyebrow{font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:5px;color:var(--gold-light);text-transform:uppercase;margin-bottom:8px;}
+.sb-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#fff;line-height:1.1;font-style:italic;}
+.sb-sub{font-family:'Josefin Sans',sans-serif;font-size:9px;color:rgba(255,255,255,.28);letter-spacing:2px;text-transform:uppercase;margin-top:6px;}
+.sb-nav{flex:1;padding:8px 0 20px;}
+.sb-group{padding:10px 22px 2px;font-family:'Josefin Sans',sans-serif;font-size:7.5px;letter-spacing:4px;color:rgba(255,255,255,.2);text-transform:uppercase;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:7px 22px;cursor:pointer;transition:all .18s;border-left:2px solid transparent;font-family:'Josefin Sans',sans-serif;font-size:11px;letter-spacing:.5px;color:rgba(255,255,255,.42);user-select:none;}
+.sb-item:hover{color:rgba(255,255,255,.75);background:rgba(255,255,255,.03);}
+.sb-item.active{color:var(--gold-light);border-left-color:var(--gold-light);background:rgba(200,160,48,.05);}
+.sb-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.15);flex-shrink:0;}
+.sb-item.active .sb-dot{background:var(--gold-light);}
+.sb-footer{padding:16px 22px;border-top:1px solid rgba(255,255,255,.05);}
+.sb-footer p{font-family:'DM Mono',monospace;font-size:8.5px;color:rgba(255,255,255,.18);line-height:1.6;}
+
+/* ── MAIN ── */
+.main{height:100vh;overflow-y:auto;background:var(--bg);}
+.panel{display:none;padding:48px 52px 100px;max-width:820px;}
+.panel.active{display:block;}
+
+/* MOBILE */
+.mob-bar{display:none;background:var(--ink);padding:13px 18px;position:sticky;top:0;z-index:50;align-items:center;justify-content:space-between;}
+.mob-tog{background:none;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.65);padding:5px 14px;border-radius:2px;font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:2px;cursor:pointer;}
+@media(max-width:800px){
+  .app{grid-template-columns:1fr;height:auto;overflow:visible;}
+  .sidebar{display:none;height:auto;}
+  .sidebar.open{display:flex;}
+  .main{height:auto;overflow-y:visible;}
+  .mob-bar{display:flex;}
+  .panel{padding:28px 22px 60px;}
+}
+
+/* ── PANEL HEADER ── */
+.ph{margin-bottom:36px;padding-bottom:26px;border-bottom:1px solid var(--border);}
+.ph-eyebrow{font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-bottom:10px;}
+.ph h1{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5vw,58px);font-weight:700;color:var(--ink);line-height:1.0;letter-spacing:-.5px;}
+.ph h1 em{font-style:italic;color:var(--gold);}
+.ph p{font-size:17px;color:var(--muted);margin-top:12px;max-width:600px;line-height:1.75;font-style:italic;}
+.ph-rule{height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin-top:20px;max-width:200px;}
+
+/* ── SECTION DIVIDER ── */
+.sdiv{display:flex;align-items:center;gap:14px;margin:30px 0 16px;}
+.sdiv-num{font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);min-width:28px;}
+.sdiv-line{flex:1;height:1px;background:var(--border);}
+.sdiv-text{font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;}
+
+/* ── BODY TEXT ── */
+.prose{font-size:16px;color:var(--text);line-height:1.8;margin:10px 0;}
+.prose strong{font-weight:600;color:var(--ink);}
+.prose em{color:var(--muted);}
+
+/* ── TIMELINE BAND ── */
+.time-band{background:var(--ink);color:rgba(255,255,255,.5);padding:9px 16px;border-radius:3px;font-family:'Josefin Sans',sans-serif;font-size:8.5px;letter-spacing:3px;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;margin:10px 0;}
+.time-band span{color:var(--gold-light);}
+
+/* ── TECHNIQUE CARDS ── */
+.tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0;}
+@media(max-width:560px){.tech-grid{grid-template-columns:1fr;}}
+.tech-card{background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden;box-shadow:0 2px 8px rgba(80,60,20,.05);}
+.tc-head{padding:12px 16px;display:flex;align-items:center;gap:10px;}
+.tc-num{font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.5);}
+.tc-title{font-family:'Josefin Sans',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#fff;font-weight:400;}
+.tc-body{padding:14px 16px;font-size:14.5px;color:var(--muted);line-height:1.75;}
+.tc-body strong{color:var(--text);font-weight:600;}
+.tch-gold{background:var(--gold);}
+.tch-copper{background:var(--copper);}
+.tch-teal{background:var(--teal);}
+.tch-navy{background:var(--navy);}
+.tch-green{background:var(--green);}
+.tch-ink{background:#2a2010;}
+
+/* ── INFO CARDS ── */
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:12px 0;box-shadow:0 1px 4px rgba(80,60,20,.05);}
+.info-card-head{padding:10px 16px;font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#fff;}
+.ich-gold{background:var(--gold);}
+.ich-copper{background:var(--copper);}
+.ich-teal{background:var(--teal);}
+.ich-navy{background:var(--navy);}
+.ich-green{background:var(--green);}
+.ich-ink{background:#2a2010;}
+.info-card-body{padding:16px;font-size:14.5px;color:var(--muted);line-height:1.75;}
+.info-card-body strong{color:var(--text);}
+.info-card-body ul{margin:8px 0 4px 18px;display:flex;flex-direction:column;gap:4px;}
+.info-card-body li{color:var(--muted);}
+
+/* ── MARKER GRID ── */
+.marker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;margin:16px 0;}
+.marker-card{background:var(--card);border:1px solid var(--border);border-radius:5px;padding:14px 15px;box-shadow:0 1px 3px rgba(80,60,20,.04);}
+.mk-name{font-family:'Josefin Sans',sans-serif;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.mk-desc{font-size:13.5px;color:var(--muted);line-height:1.65;}
+
+/* ── STEP LIST ── */
+.step-list{display:flex;flex-direction:column;gap:10px;margin:16px 0;}
+.step-item{display:flex;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:14px 17px;box-shadow:0 1px 3px rgba(80,60,20,.04);}
+.step-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);min-width:24px;margin-top:2px;flex-shrink:0;font-weight:500;}
+.step-body{}
+.step-title{font-size:15px;color:var(--ink);font-weight:600;margin-bottom:3px;line-height:1.3;}
+.step-detail{font-size:13.5px;color:var(--muted);line-height:1.65;}
+
+/* ── CALLOUT ── */
+.callout{border-left:3px solid var(--gold);padding:12px 17px;background:var(--gold-dim);border-radius:0 6px 6px 0;margin:14px 0;font-size:14.5px;color:var(--text);}
+.callout.copper{border-color:var(--copper);background:var(--copper-dim);}
+.callout.teal{border-color:var(--teal);background:var(--teal-dim);}
+.callout strong{color:var(--ink);}
+
+/* ── WARN BOX ── */
+.warn-box{background:#fff8f0;border:1px solid rgba(154,72,32,.2);border-radius:5px;padding:14px 17px;margin:14px 0;display:flex;gap:11px;}
+.warn-icon{color:var(--copper);font-size:16px;flex-shrink:0;margin-top:2px;}
+.warn-text{font-size:14px;color:var(--text);line-height:1.7;}
+.warn-text strong{color:var(--copper);}
+
+/* ── BRAND ROW ── */
+.brand-row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+.brand-pill{display:inline-block;padding:5px 14px;border:1px solid var(--border2);border-radius:3px;font-family:'Josefin Sans',sans-serif;font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);background:var(--card);}
+
+/* ── MATERIAL TABLE ── */
+.mat-table{width:100%;border-collapse:collapse;margin:14px 0;background:var(--card);border-radius:6px;overflow:hidden;box-shadow:0 1px 4px rgba(80,60,20,.05);}
+.mat-table th{background:var(--ink);font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.45);padding:10px 14px;text-align:left;}
+.mat-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text);vertical-align:top;}
+.mat-table tr:last-child td{border-bottom:none;}
+.mat-table tr:hover td{background:var(--surface);}
+.mat-table td:first-child{font-family:'Josefin Sans',sans-serif;font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);font-weight:600;}
+
+/* ── BIG QUOTE ── */
+.big-quote{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,3vw,26px);font-style:italic;color:var(--ink);line-height:1.5;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:24px 0;position:relative;}
+.big-quote::before{content:'"';font-size:80px;color:var(--gold);line-height:1;position:absolute;top:-10px;left:-10px;opacity:.3;font-style:normal;}
+
+/* ── OVERVIEW HERO ── */
+.hero-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:20px 0;}
+.hero-cell{background:var(--card);padding:18px;text-align:center;}
+.hero-num{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:var(--gold);line-height:1;}
+.hero-label{font-family:'Josefin Sans',sans-serif;font-size:8.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+@media(max-width:500px){.hero-grid{grid-template-columns:1fr;}}
+
+/* ── TAG PILLS ── */
+.tag{display:inline-block;padding:2px 9px;border-radius:3px;font-family:'Josefin Sans',sans-serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.tag-gold{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(138,104,32,.2);}
+.tag-copper{background:var(--copper-dim);color:var(--copper);border:1px solid rgba(154,72,32,.18);}
+.tag-warn{background:#fff3e0;color:#a05020;border:1px solid rgba(160,80,32,.2);}
+.tag-teal{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(26,96,88,.2);}
+
+/* ── SEPARATOR ── */
+.ornament{text-align:center;margin:24px 0;font-size:18px;color:var(--border2);letter-spacing:10px;}
+</style>
+</head>
+<body>
+
+<div class="mob-bar">
+  <div style="font-family:'Josefin Sans',sans-serif;font-size:10px;color:var(--gold-light);letter-spacing:3px;">WATCH DIALS</div>
+  <button class="mob-tog" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰ MENU</button>
+</div>
+
+<div class="app">
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-eyebrow">A Reference Guide</div>
+    <div class="sb-title">Watch<br>Dials</div>
+    <div class="sb-sub">History · Techniques · Restoration</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-group">Introduction</div>
+    <div class="sb-item active" onclick="nav(this,'p0')"><span class="sb-dot"></span>Overview</div>
+
+    <div class="sb-group">Dial Materials</div>
+    <div class="sb-item" onclick="nav(this,'p1')"><span class="sb-dot"></span>Enamel Dials</div>
+    <div class="sb-item" onclick="nav(this,'p2')"><span class="sb-dot"></span>Enameling Techniques</div>
+    <div class="sb-item" onclick="nav(this,'p3')"><span class="sb-dot"></span>Solid Metal Dials</div>
+    <div class="sb-item" onclick="nav(this,'p4')"><span class="sb-dot"></span>Porcelain Dials</div>
+    <div class="sb-item" onclick="nav(this,'p5')"><span class="sb-dot"></span>Plastic & Synthetic</div>
+
+    <div class="sb-group">Dial Finishing</div>
+    <div class="sb-item" onclick="nav(this,'p6')"><span class="sb-dot"></span>Guilloché (Engine-Turned)</div>
+    <div class="sb-item" onclick="nav(this,'p7')"><span class="sb-dot"></span>Pierced & Skeleton Dials</div>
+    <div class="sb-item" onclick="nav(this,'p8')"><span class="sb-dot"></span>Subdials & Sunken Areas</div>
+    <div class="sb-item" onclick="nav(this,'p9')"><span class="sb-dot"></span>Full Lume Dials</div>
+
+    <div class="sb-group">Printing & Indexes</div>
+    <div class="sb-item" onclick="nav(this,'p10')"><span class="sb-dot"></span>Printed Dials — History</div>
+    <div class="sb-item" onclick="nav(this,'p11')"><span class="sb-dot"></span>Pad Printing Today</div>
+    <div class="sb-item" onclick="nav(this,'p12')"><span class="sb-dot"></span>Applied Markers & Numerals</div>
+    <div class="sb-item" onclick="nav(this,'p13')"><span class="sb-dot"></span>Marker Types</div>
+
+    <div class="sb-group">Restoration</div>
+    <div class="sb-item" onclick="nav(this,'p14')"><span class="sb-dot"></span>Cleaning Dials</div>
+    <div class="sb-item" onclick="nav(this,'p15')"><span class="sb-dot"></span>Repairing Dial Feet</div>
+    <div class="sb-item" onclick="nav(this,'p16')"><span class="sb-dot"></span>Adhesives & Dial Dots</div>
+  </nav>
+  <div class="sb-footer">
+    <p>From enamel to melamine,<br>from rose engines to pad printers —<br>the dial is the face of the art.</p>
+  </div>
+</aside>
+
+<main class="main">
+
+<!-- 00 OVERVIEW -->
+<div class="panel active" id="p0">
+  <div class="ph">
+    <div class="ph-eyebrow">A Complete Reference</div>
+    <h1>Watch Dials —<br>The <em>Face</em> of the Art</h1>
+    <p>From 17th-century enamel paintings to modern pad printing, the watch dial is where materials science, art, and craft converge. This guide covers every major dial type, technique, and restoration method.</p>
+    <div class="ph-rule"></div>
+  </div>
+  <div class="hero-grid">
+    <div class="hero-cell"><div class="hero-num">400+</div><div class="hero-label">Years of evolution</div></div>
+    <div class="hero-cell"><div class="hero-num">8</div><div class="hero-label">Major material types</div></div>
+    <div class="hero-cell"><div class="hero-num">13</div><div class="hero-label">Marker styles catalogued</div></div>
+  </div>
+  <div class="big-quote">The dial is the first thing you see and the last thing the watchmaker touches. Every technique reflects its era.</div>
+  <div class="sdiv"><span class="sdiv-num">§</span><div class="sdiv-line"></div><span class="sdiv-text">Timeline of Materials</span></div>
+  <table class="mat-table">
+    <thead><tr><th>Era</th><th>Material</th><th>Key Characteristic</th></tr></thead>
+    <tbody>
+      <tr><td>17th century</td><td>Enamel on gold/silver cases</td><td>Decorative painted scenes; Jean Toutin's pioneering techniques</td></tr>
+      <tr><td>18th–19th c.</td><td>Solid metal (brass, silver)</td><td>Durable, versatile; guilloché engraving flourishes</td></tr>
+      <tr><td>Late 1700s</td><td>Porcelain</td><td>Smooth gloss, elegant; fragile; popular in European pocket watches</td></tr>
+      <tr><td>Mid-1880s</td><td>Printed enamel (mechanical)</td><td>Mass production begins; hand-painters displaced</td></tr>
+      <tr><td>1946</td><td>Melamine (thermoplastic)</td><td>Hamilton innovation; bright white; later prone to cracking</td></tr>
+      <tr><td>Late 1800s</td><td>Celluloid ("French ivory")</td><td>Keystone Watch Co.; ages to creamy yellow; rarely found intact</td></tr>
+      <tr><td>20th c.–now</td><td>Modern plastics, synthetics</td><td>Lightweight, colorfast, mass-market friendly</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 01 ENAMEL DIALS -->
+<div class="panel" id="p1">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 1 · Materials</div>
+    <h1><em>Enamel</em> Dials</h1>
+    <p>The oldest and most revered dial finishing art. Ground glass fired onto metal at high temperature — an act that has remained fundamentally unchanged for four centuries.</p>
+    <div class="ph-rule"></div>
+  </div>
+  <div class="time-band">Time period <span>Early 17th century onwards</span></div>
+
+  <div class="sdiv"><span class="sdiv-num">1.1</span><div class="sdiv-line"></div><span class="sdiv-text">Historical Beginnings</span></div>
+  <p class="prose">The practice of applying enamel to watch cases began in <strong>France in the early 17th century</strong>. Jean Toutin, a notable figure from that era, is believed to have initiated the technique. By the 18th and 19th centuries, both watch dials and cases adorned with enamel became widespread throughout Europe's finest watchmaking houses.</p>
+
+  <div class="sdiv"><span class="sdiv-num">1.2</span><div class="sdiv-line"></div><span class="sdiv-text">Understanding Enamel</span></div>
+  <p class="prose">Enamel is fundamentally <strong>ground glass — silica — that adheres to metal when subjected to high heat</strong>. Its versatility is remarkable: the material can range from transparent to fully opaque to opalescent, depending on formulation and firing.</p>
+
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tc-head tch-gold"><span class="tc-num">01</span><span class="tc-title">Transparent</span></div><div class="tc-body">Glass-clear enamel applied over guilloché or engraved metal to preserve the pattern below while adding depth and gloss.</div></div>
+    <div class="tech-card"><div class="tc-head tch-copper"><span class="tc-num">02</span><span class="tc-title">Opaque</span></div><div class="tc-body">Solid, non-see-through enamel. The classic white dial base used for applied numerals and hands. Grand Feu white is the benchmark.</div></div>
+    <div class="tech-card"><div class="tc-head tch-teal"><span class="tc-num">03</span><span class="tc-title">Opalescent</span></div><div class="tc-body">Semi-translucent with a pearl-like sheen. Rare and prized; difficult to achieve consistent results. Often seen in high jewellery watches.</div></div>
+    <div class="tech-card"><div class="tc-head tch-navy"><span class="tc-num">04</span><span class="tc-title">Painted</span></div><div class="tc-body">Specialist paints and tints applied atop enamel layers to create miniature paintings. Microscopic brushwork requiring extraordinary skill.</div></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-num">1.3</span><div class="sdiv-line"></div><span class="sdiv-text">Modern Survival</span></div>
+  <p class="prose">The 1940s marked a resurgence in watch enameling. Brands like <strong>Patek Philippe, Rolex, and Vacheron Constantin</strong> began crafting limited editions with enameled dials. Today only a handful of houses still produce them, but their significance has not waned.</p>
+  <div class="brand-row">
+    <span class="brand-pill">Patek Philippe</span>
+    <span class="brand-pill">Vacheron Constantin</span>
+    <span class="brand-pill">Jaquet Droz</span>
+    <span class="brand-pill">Rolex</span>
+    <span class="brand-pill">Ulysse Nardin</span>
+  </div>
+  <p class="prose">Patek Philippe in the 1960s collaborated with master enamelers <strong>Charles Poluzzi</strong> and <strong>Nelly Richards</strong>, underscoring the rarity and value of the craft in contemporary watchmaking.</p>
+</div>
+
+<!-- 02 ENAMELING TECHNIQUES -->
+<div class="panel" id="p2">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 2 · Techniques</div>
+    <h1>Fine <em>Enameling</em></h1>
+    <p>Four distinct methods, each with its own visual character, required skill level, and historical context. Many high-end dials combine multiple techniques.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-num">2.1</span><div class="sdiv-line"></div><span class="sdiv-text">Cloisonné</span></div>
+  <p class="prose"><strong>Cloisonné</strong> involves fixing fine metal wires (or strips) onto a surface to create compartments — <em>cloisons</em> in French. These compartments contain the enamel, and the metal wires themselves become decorative lines of the finished design. The result is a cell-like pattern with precise colour divisions. The technique demands extraordinary patience: each cell is filled with powdered enamel, fired, and often re-filled and re-fired many times to build up an even surface.</p>
+  <div class="callout"><strong>Key visual characteristic:</strong> Fine metal lines visible between areas of colour — the "lead lines" of enamel art. Each colour cell has clean, precise edges.</div>
+
+  <div class="sdiv"><span class="sdiv-num">2.2</span><div class="sdiv-line"></div><span class="sdiv-text">Champlevé</span></div>
+  <p class="prose"><strong>Champlevé</strong> (from the French, meaning "raised field") involves cutting troughs or cells directly into a metal plate and filling them with powdered enamel. The raised metal lines between the cutout areas form the design's outline. The piece is fired until the enamel fuses, then ground flush and polished. Unlike cloisonné, no wires are added — the design is carved out of the base metal itself.</p>
+  <div class="callout"><strong>Key distinction from cloisonné:</strong> In champlevé, the dividing lines are part of the original metal plate — they are left raised as metal is removed around them, rather than wires being added on top.</div>
+
+  <div class="sdiv"><span class="sdiv-num">2.3</span><div class="sdiv-line"></div><span class="sdiv-text">Grand Feu Enamel</span></div>
+  <p class="prose"><strong>Grand Feu</strong> (meaning "great fire") is the highest expression of the enameler's art. Powdered silica and mineral compounds are applied to a gold, silver, or copper base and fired in a furnace at very high temperatures — typically above 800°C. Multiple layers are applied in succession, with the piece re-fired between each coat. The technique creates a deep, glassy surface with extraordinary luminosity.</p>
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tc-head tch-copper"><span class="tc-num">Step 1</span><span class="tc-title">Counter-enamel</span></div><div class="tc-body">A layer of enamel is applied to the back of the metal plate first. This prevents the plate from warping under the high heat of subsequent firings.</div></div>
+    <div class="tech-card"><div class="tc-head tch-gold"><span class="tc-num">Step 2</span><span class="tc-title">Ground Coat</span></div><div class="tc-body">The base enamel layer is applied and fired. For a white dial, multiple firings of opaque white are needed to achieve the correct brightness and evenness.</div></div>
+    <div class="tech-card"><div class="tc-head tch-teal"><span class="tc-num">Step 3</span><span class="tc-title">Colour Layers</span></div><div class="tc-body">Subsequent enamel layers are applied over the fired base. Each colour layer requires its own firing, often 5–7 firings total for a complex dial.</div></div>
+    <div class="tech-card"><div class="tc-head tch-navy"><span class="tc-num">Step 4</span><span class="tc-title">Final Firing</span></div><div class="tc-body">The final firing determines the ultimate surface quality. The piece is watched continuously — seconds can mean the difference between perfection and ruin.</div></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-num">2.4</span><div class="sdiv-line"></div><span class="sdiv-text">Painted Enamel</span></div>
+  <p class="prose">In <strong>painted enamel</strong>, specialized ceramic paints or tints are used to create imagery atop or between enamel layers. The finest examples are miniature paintings of extraordinary detail — landscapes, portraits, mythological scenes — executed with brushes containing just a handful of hairs and viewed under magnification. Multiple techniques are often combined: a grand feu base, then painted details fired at lower temperatures to preserve the colours.</p>
+  <div class="callout teal"><strong>Patek Philippe's miniature enamel painters</strong> are among the last practitioners of this art. A single dial can take months to complete and may involve dozens of individual firings, with the risk of catastrophic failure present at every stage.</div>
+</div>
+
+<!-- 03 SOLID METAL DIALS -->
+<div class="panel" id="p3">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 3 · Materials</div>
+    <h1>Solid <em>Metal</em> Dials</h1>
+    <p>Practical, beautiful, and enduring — metal dials democratised fine watchmaking and enabled mass production without sacrificing aesthetics.</p>
+    <div class="ph-rule"></div>
+  </div>
+  <div class="time-band">Time period <span>17th century onwards</span></div>
+
+  <p class="prose">Metal watch dials gained popularity in the 18th century. Advances in metalworking and increased demand for durable, versatile designs made materials like <strong>brass and silver</strong> the favoured choices.</p>
+
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tc-head tch-gold"><span class="tc-num">✓</span><span class="tc-title">Durability</span></div><div class="tc-body">Metals are harder and withstand far more wear than enamel, which can crack or chip. A brass dial can survive handling that would destroy an enamel surface.</div></div>
+    <div class="tech-card"><div class="tc-head tch-teal"><span class="tc-num">✓</span><span class="tc-title">Versatility</span></div><div class="tc-body">Metal can be molded, engraved, guilloché'd, silvered, gilt, painted, and decorated in virtually unlimited ways — far broader than any ceramic approach.</div></div>
+    <div class="tech-card"><div class="tc-head tch-copper"><span class="tc-num">✓</span><span class="tc-title">Affordability</span></div><div class="tc-body">Mass production of metal dials made watches accessible to far broader markets. The 19th-century pocket watch boom was built on industrial metal dial production.</div></div>
+    <div class="tech-card"><div class="tc-head tch-navy"><span class="tc-num">✓</span><span class="tc-title">Finishing Range</span></div><div class="tc-body">From matt brushed to mirror polished, from frosted silver to sunray gilt — the same metal substrate can receive radically different surface treatments.</div></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-num">3.1</span><div class="sdiv-line"></div><span class="sdiv-text">Silvered Dials</span></div>
+  <p class="prose">A <strong>"silvered" dial</strong> has a silver-like appearance — but this does not necessarily mean pure silver. It is often a surface treatment that delivers a shiny, silver-coloured finish. Methods include genuine silver plating (a thin electrolytic layer of silver over brass) or silver-coloured lacquer or paint. Silver has a classic, bright, high-contrast look that aids legibility and pairs with virtually any strap or case material.</p>
+  <div class="callout"><strong>Important distinction:</strong> Silver plating, silver paint, and solid silver dials are three different things. Always check specifications if authenticity matters.</div>
+
+  <div class="sdiv"><span class="sdiv-num">3.2</span><div class="sdiv-line"></div><span class="sdiv-text">Gold & Gilt Dials</span></div>
+  <p class="prose">While more expensive and thus less common than silvered dials, gold was also employed in high-end watches. Some dials were fully <strong>gilded</strong> — coated with a layer of gold — offering the appearance of solid gold at more affordable cost. Gilt dials range from yellow gold to champagne to pink gold tones depending on the alloy and plating process used.</p>
+
+  <div class="sdiv"><span class="sdiv-num">3.3</span><div class="sdiv-line"></div><span class="sdiv-text">Moon Phase & Calendar Indicators</span></div>
+  <p class="prose">Some advanced watch dials incorporated moon phase indicators or calendar functions. These were often made of metal with <strong>engraved or painted details</strong>. The 18th century witnessed great experimentation in this area — metal dials from this era showcase the intricate craftsmanship and artistic vision of watchmakers of the time.</p>
+</div>
+
+<!-- 04 PORCELAIN -->
+<div class="panel" id="p4">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 4 · Materials</div>
+    <h1><em>Porcelain</em> Dials</h1>
+    <p>The luxury ceramic. Smoother than enamel, more fragile, and supremely elegant — the hallmark of European high-end pocket watchmaking in the 19th century.</p>
+    <div class="ph-rule"></div>
+  </div>
+  <div class="time-band">Time period <span>18th century into early 20th century</span></div>
+
+  <p class="prose">Porcelain, often called "china" due to its origins, is a ceramic baked at high temperatures to achieve a hard, characteristically translucent quality. It is <strong>similar in appearance to enamel but typically thicker</strong>, and can be more easily cracked or chipped. By the late 1700s, watchmakers began experimenting with porcelain dials because of their aesthetic appeal.</p>
+
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tc-head tch-gold"><span class="tc-num">+</span><span class="tc-title">Fade Resistance</span></div><div class="tc-body">Porcelain dials resist fading exceptionally well, maintaining their pristine appearance for a very long time — often outlasting the mechanisms they were fitted to.</div></div>
+    <div class="tech-card"><div class="tc-head tch-teal"><span class="tc-num">+</span><span class="tc-title">Surface Quality</span></div><div class="tc-body">The smooth, glossy fired finish provides an elegant backdrop for painted numerals and hands. Black enamel printing on white porcelain achieves exceptional clarity.</div></div>
+    <div class="tech-card"><div class="tc-head tch-copper"><span class="tc-num">+</span><span class="tc-title">Element Resistance</span></div><div class="tc-body">Porcelain does not rust or corrode. It resists moisture and UV light — both major concerns for dials exposed to changing environments over decades.</div></div>
+    <div class="tech-card"><div class="tc-head tch-ink"><span class="tc-num">−</span><span class="tc-title">Fragility</span></div><div class="tc-body">Despite its hardness, porcelain is brittle. Any crack or imperfection in the unfired clay will be visible — and usually catastrophic — after kiln firing. Precision was paramount.</div></div>
+  </div>
+
+  <p class="prose">As the 19th century progressed, porcelain dials became increasingly common, especially in <strong>European pocket watches</strong>. Making them required skilled craftsmanship — any imperfection would be evident once fired, so precision was paramount throughout the entire production process.</p>
+
+  <div class="callout teal"><strong>Collector's note:</strong> An original, uncracked porcelain dial on a 19th-century pocket watch is a genuine treasure. Many were damaged during case changes or by temperature fluctuations over the decades. A pristine porcelain dial significantly increases the value of any vintage pocket watch.</div>
+</div>
+
+<!-- 05 PLASTIC & SYNTHETIC -->
+<div class="panel" id="p5">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 5 · Materials</div>
+    <h1>Plastic &amp; <em>Synthetic</em> Dials</h1>
+    <p>The industrial revolution extended to horology. Thermoplastics promised everything — and mostly delivered, with one notable, catastrophic exception.</p>
+    <div class="ph-rule"></div>
+  </div>
+  <div class="time-band">Time period <span>20th century to present</span></div>
+
+  <p class="prose">Synthetic materials began entering the watch industry during the mid-20th century. The post-World War II era saw a surge in industrial advancements — and watchmakers, always pragmatic, were quick to explore cheaper, lighter, and more consistent alternatives to traditional materials.</p>
+
+  <div class="sdiv"><span class="sdiv-num">5.1</span><div class="sdiv-line"></div><span class="sdiv-text">Melamine — Hamilton's Gamble</span></div>
+  <p class="prose">In <strong>1946</strong>, the Hamilton Watch Company began using <strong>melamine</strong>, a newly commercialised thermoplastic, for watch dials. No company had successfully done this before. Hamilton believed melamine was an excellent alternative to enamel — and for a time, they were right.</p>
+
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tc-head tch-gold"><span class="tc-num">+</span><span class="tc-title">Appearance</span></div><div class="tc-body">Melamine maintained a bright white look, avoiding the yellowing or discolouration often seen in aging enamel dials.</div></div>
+    <div class="tech-card"><div class="tc-head tch-teal"><span class="tc-num">+</span><span class="tc-title">Heat Resistance</span></div><div class="tc-body">Melamine withstands up to 300°F — useful enough as a replacement for enamel on gas stoves as well as watch dials.</div></div>
+    <div class="tech-card"><div class="tc-head tch-copper"><span class="tc-num">+</span><span class="tc-title">Cost Efficiency</span></div><div class="tc-body">Lower baking temperature and faster cooling made each melamine dial approximately $1.16 cheaper than its enamel counterpart — significant at scale.</div></div>
+    <div class="tech-card"><div class="tc-head tch-ink"><span class="tc-num">−</span><span class="tc-title">The Fatal Flaw</span></div><div class="tc-body">Over time, melamine continually expands and contracts. This constant movement eventually causes fractures across the dial surface — a flaw all collectors of Hamilton pieces know well.</div></div>
+  </div>
+
+  <div class="warn-box"><span class="warn-icon">⚠</span><div class="warn-text"><strong>Collector warning:</strong> Melamine dial cracking (sometimes called "spider-webbing" or "crazing") is inherent to the material — not a result of poor care. If the dial has not yet cracked, do not expose it to temperature extremes. Once cracking begins, it is irreversible. An uncracked melamine dial in excellent condition is increasingly rare.</div></div>
+
+  <div class="sdiv"><span class="sdiv-num">5.2</span><div class="sdiv-line"></div><span class="sdiv-text">Celluloid — French Ivory</span></div>
+  <p class="prose">In the late 1880s, <strong>Abraham Bitner</strong> saw an opportunity to create affordable watch dials for the Keystone Watch Company using celluloid — also known as "French ivory." Celluloid was originally developed in 1856 by Alexander Parkes as "Parkesine," and modified by John Wesley Hyatt in 1869 to closely mimic the appearance of ivory.</p>
+  <p class="prose">The dials initially had an ivory colour, but over time most have aged to a <strong>creamy yellow tone</strong> with delicate wavy patterns on the surface characteristic of French ivory. These dials are very rarely found today in good condition.</p>
+</div>
+
+<!-- 06 GUILLOCHÉ -->
+<div class="panel" id="p6">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 6 · Finishing</div>
+    <h1>Guilloché<br><em>Engine-Turned</em> Dials</h1>
+    <p>The marriage of precision machinery and watchmaking artistry. A rose engine turns raw metal into something that seems to breathe with light.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="big-quote">Guilloché patterns catch light in ways that no painted surface ever can — each angle of view reveals something different.</div>
+
+  <p class="prose"><strong>Guilloché</strong> (pronounced <em>gee-oh-shay</em>) is a decorative technique in which a precise and intricate pattern is mechanically engraved into an underlying material using a specialised machine called a <strong>rose engine</strong>. When applied to watch dials, they are referred to as "engine-turned dials."</p>
+
+  <div class="sdiv"><span class="sdiv-num">6.1</span><div class="sdiv-line"></div><span class="sdiv-text">Common Patterns</span></div>
+  <div class="marker-grid">
+    <div class="marker-card"><div class="mk-name">Clous de Paris</div><div class="mk-desc">Fine pyramid-shaped points in a regular grid. Classic and formal — used extensively by Cartier.</div></div>
+    <div class="marker-card"><div class="mk-name">Barleycorn</div><div class="mk-desc">Wave-like pattern resembling overlapping grains. Elegant and textural.</div></div>
+    <div class="marker-card"><div class="mk-name">Sunburst / Rayonnant</div><div class="mk-desc">Lines radiating from a central point. Catches light dramatically as the wrist moves.</div></div>
+    <div class="marker-card"><div class="mk-name">Moiré</div><div class="mk-desc">Overlapping wave patterns creating an optical interference effect — difficult to execute consistently.</div></div>
+    <div class="marker-card"><div class="mk-name">Côtes de Genève</div><div class="mk-desc">Parallel oblique stripes. Originally a bridge-finishing technique now also applied to dials.</div></div>
+    <div class="marker-card"><div class="mk-name">Flinqué</div><div class="mk-desc">Guilloché covered with translucent enamel. The pattern shows through the enamel for extraordinary depth.</div></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-num">6.2</span><div class="sdiv-line"></div><span class="sdiv-text">The Rose Engine</span></div>
+  <div class="step-list">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-title">Pattern Selection</div><div class="step-detail">A rosette cam is selected for the rose engine — the cam profile determines the oscillating pattern that the cutting tool will follow as the workpiece rotates.</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-title">Engraving</div><div class="step-detail">The diamond-tipped cutting tool removes metal in an extremely precise path determined by the cam and the operator's controlled advance. Lines can be as fine as a hundred per millimetre.</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-title">Hand Finishing</div><div class="step-detail">The finest guilloché work is hand-finished by an artisan who adjusts the depth and angle of individual passes. A computer-controlled machine cannot replicate the subtle variations that give hand-guilloché its life.</div></div></div>
+  </div>
+
+  <div class="callout"><strong>Why guilloché with transparent enamel is exceptional:</strong> When translucent enamel (flinqué) is applied over guilloché, the glass layer creates depth — the pattern appears to sit below the surface, with light refracting through the enamel before hitting the cut metal. The effect is completely three-dimensional.</div>
+</div>
+
+<!-- 07 PIERCED DIALS -->
+<div class="panel" id="p7">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 7 · Finishing</div>
+    <h1><em>Pierced</em> & Skeleton Dials</h1>
+    <p>Removing material to reveal what lies beneath. The most dramatic and technically demanding dial form — where the dial becomes part of the display.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <p class="prose">A pierced dial for a skeleton watch is a dial where parts of the watch face are <strong>meticulously cut away</strong>. This reveals the intricate inner workings of the watch — gears, springs, balance wheel — creating a mesmerising view directly through the dial.</p>
+
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tc-head tch-gold"><span class="tc-num">→</span><span class="tc-title">Structural Challenge</span></div><div class="tc-body">Material must be carefully removed while leaving sufficient structural support. Removing too much creates a fragile, resonant structure that can amplify vibration and damage itself. Every cut is irreversible.</div></div>
+    <div class="tech-card"><div class="tc-head tch-copper"><span class="tc-num">→</span><span class="tc-title">Precision Requirement</span></div><div class="tc-body">The cuts must be precise enough that hands do not foul on the remaining dial elements at any position. Each opening must be deliberately shaped and finished — no rough edges.</div></div>
+    <div class="tech-card"><div class="tc-head tch-teal"><span class="tc-num">→</span><span class="tc-title">Finishing Demand</span></div><div class="tc-body">Pierced dials require finishing on every visible edge — inside each cutout as well as the outer perimeter. Hand-bevelling with tiny files under magnification is typical.</div></div>
+    <div class="tech-card"><div class="tc-head tch-navy"><span class="tc-num">→</span><span class="tc-title">The Reward</span></div><div class="tc-body">Skeleton watches are prized for allowing the wearer to see the mechanically alive interior. A well-made pierced dial frames the movement without competing with it.</div></div>
+  </div>
+
+  <div class="callout teal"><strong>Design principle:</strong> The remaining dial material should frame and enhance the view of the movement below — not obscure it. The best pierced dials look inevitable: as if no other configuration could possibly have been right.</div>
+</div>
+
+<!-- 08 SUBDIALS -->
+<div class="panel" id="p8">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 8 · Finishing</div>
+    <h1>Sunken Areas &amp;<br><em>Subdial</em> Architecture</h1>
+    <p>Single sunk, double sunk — the language of pocket watch dials. Recessed zones that prevent hand interference while adding visual hierarchy.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <p class="prose">A dial with sunken areas features small, recessed sections where additional watch functions — known as <strong>subdials</strong> — are placed. These can display: subsidiary seconds, date, chronograph elapsed time, or additional time zones. Depending on how many recessed areas there are, dials are called <strong>"single sunk"</strong> or <strong>"double sunk."</strong></p>
+
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tc-head tch-gold"><span class="tc-num">§</span><span class="tc-title">Single Sunk</span></div><div class="tc-body">One recessed area — typically at 6 o'clock for a subsidiary seconds hand. The most common configuration in vintage pocket watches.</div></div>
+    <div class="tech-card"><div class="tc-head tch-copper"><span class="tc-num">§§</span><span class="tc-title">Double Sunk</span></div><div class="tc-body">Two recessed areas. Common in complex pocket watches with seconds at 6 and a calendar or power reserve indicator at 12.</div></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-num">8.1</span><div class="sdiv-line"></div><span class="sdiv-text">Why Sunken Areas Matter</span></div>
+  <p class="prose">The primary technical reason for sunken subdial areas is <strong>hand clearance</strong>. The subdial hands (subsidiary seconds, for instance) are shorter than the main hands. By recessing the subdial surface, those short hands can sweep their own arc without coming close to — or catching on — the longer hour and minute hands sweeping the main dial level above.</p>
+  <p class="prose">The process of creating these recesses involves <strong>precision machining</strong> of the dial surface. On enamel dials, this is extraordinarily difficult — the enamel must be applied to an already-recessed metal form. The resulting step in the enamel surface is a mark of exceptional workmanship.</p>
+
+  <div class="callout"><strong>Common in:</strong> Vintage pocket watches (single sunk subsidiary seconds), complicated pocket watches (double sunk), chronograph wristwatches, pilot watches with additional timezone registers.</div>
+</div>
+
+<!-- 09 FULL LUME -->
+<div class="panel" id="p9">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 9 · Finishing</div>
+    <h1>Full <em>Lume</em> Dials</h1>
+    <p>Legibility taken to its logical extreme. When darkness is the primary environment, the dial itself becomes the light source.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <p class="prose">Full lume dials can be <strong>completely coated on the back</strong> or feature large luminous areas on the dial surface to make viewing in low light as easy as possible. They typically feature <strong>dark minute and hour tracks</strong> around the dial perimeter to contrast with the glowing lume and define the scale.</p>
+
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tc-head tch-teal"><span class="tc-num">→</span><span class="tc-title">Military Heritage</span></div><div class="tc-body">Full lume dials descend from military specification watches where legibility in the dark was not a preference but an operational requirement. Early versions used radium — now strictly avoided.</div></div>
+    <div class="tech-card"><div class="tc-head tch-navy"><span class="tc-num">→</span><span class="tc-title">Modern Materials</span></div><div class="tc-body">Contemporary lume dials use photoluminescent materials — primarily Super-LumiNova — which absorb light and emit it slowly in the dark. Non-radioactive and extremely long-lasting.</div></div>
+    <div class="tech-card"><div class="tc-head tch-gold"><span class="tc-num">→</span><span class="tc-title">Contrast Design</span></div><div class="tc-body">The visual contrast between the dark hour/minute tracks and the glowing lume fields defines the dial's legibility. The darker the track, the more the lume appears to glow against it.</div></div>
+    <div class="tech-card"><div class="tc-head tch-copper"><span class="tc-num">→</span><span class="tc-title">Application</span></div><div class="tc-body">Lume is applied by hand under magnification — a skilled process. Achieving uniform thickness across the entire dial surface determines both appearance and glow duration.</div></div>
+  </div>
+
+  <div class="warn-box"><span class="warn-icon">⚠</span><div class="warn-text"><strong>Vintage lume warning:</strong> Radium was used in watch dials until the mid-20th century. Vintage watches with original lume should be tested by a specialist before extended handling. Do not attempt to rework or remove vintage lume without professional guidance.</div></div>
+</div>
+
+<!-- 10 PRINTED DIALS HISTORY -->
+<div class="panel" id="p10">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 10 · Printing</div>
+    <h1>Printed Dials —<br>A <em>Revolution</em></h1>
+    <p>The moment mass production reached the watch dial. A craft tradition ended; a manufacturing era began. The results were profound for better and worse.</p>
+    <div class="ph-rule"></div>
+  </div>
+  <div class="time-band">The pivotal moment <span>Mid-1880s</span></div>
+
+  <p class="prose">Prior to the mid-1880s, each watch dial was individually hand-painted by <strong>master dial painters</strong> — skilled artisans employed by watch factories to meticulously letter, number, and decorate each dial by hand. The process was time-consuming and expensive. The mastery required to achieve uniformity across hundreds of dials was extraordinary.</p>
+
+  <div class="big-quote">A master dial painter could produce perhaps a dozen perfect dials a day. A mechanical transfer press could produce hundreds.</div>
+
+  <div class="sdiv"><span class="sdiv-num">10.1</span><div class="sdiv-line"></div><span class="sdiv-text">The Two Pioneers</span></div>
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tc-head tch-gold"><span class="tc-num">Elgin</span><span class="tc-title">Mechanical Transfer</span></div><div class="tc-body">Elgin of Illinois pioneered a mechanical transfer process that allowed mass production of dials with identical designs. Rather than a painter's hand, a mechanical process transferred the design consistently to each blank.</div></div>
+    <div class="tech-card"><div class="tc-head tch-teal"><span class="tc-num">Waltham</span><span class="tc-title">Photographic Process</span></div><div class="tc-body">Waltham of Massachusetts introduced a photographic process: the dial surface was exposed to chemicals and light, then enamel powder was applied. The powder adhered only in predetermined areas, creating intricate patterns with precision impossible to hand-paint.</div></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-num">10.2</span><div class="sdiv-line"></div><span class="sdiv-text">The Impact</span></div>
+  <p class="prose">These innovations allowed companies to manufacture dials more swiftly and economically than ever before. However, dials created using new methods <strong>lacked the unique characteristics and imperfections</strong> of hand-painted work. The shift profoundly influenced watch dial aesthetics — and made accurate pocket watches accessible to far broader audiences. It was the convergence of craftsmanship and automation that reshaped horology forever.</p>
+</div>
+
+<!-- 11 PAD PRINTING -->
+<div class="panel" id="p11">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 11 · Printing</div>
+    <h1>Pad Printing <em>Today</em></h1>
+    <p>The modern standard for watch dial text and markers. Flexible, repeatable, and capable of extraordinary fineness — the silicone pad goes where no rigid printing plate can.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <p class="prose">Pad printing (also called <em>tampo printing</em>) uses a flexible silicone pad to transfer ink from an engraved plate — the <strong>cliché</strong> — onto the watch dial surface. The pad's flexibility is the key: it can conform to curved, contoured, or textured surfaces that would defeat any flat printing method.</p>
+
+  <div class="step-list">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-title">Cliché Preparation</div><div class="step-detail">The cliché — a steel or polymer printing plate — is laser-etched or chemically engraved with the design. Every detail of the text, indices, and logo is in this plate. Depth and precision here determine the final print quality.</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-title">Dial Preparation</div><div class="step-detail">The dial (usually brass or stainless steel) is carefully cleaned to ensure a contaminant-free surface. Any dust or oil will cause adhesion failure. Dials are often handled only by their edges from this point.</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-title">Ink Preparation</div><div class="step-detail">Specialised ink is mixed to precise viscosity. Colour consistency and formulation directly determine the durability and appearance of the print. Metallic inks (gold, silver) require additional care as the metallic particles can affect flow.</div></div></div>
+    <div class="step-item"><div class="step-num">4</div><div class="step-body"><div class="step-title">Transfer</div><div class="step-detail">The silicone pad presses onto the inked cliché, picking up ink from the engraved areas. It then presses precisely onto the dial, releasing the ink onto the surface. The pad's flexibility allows it to follow any contour.</div></div></div>
+    <div class="step-item"><div class="step-num">5</div><div class="step-body"><div class="step-title">Drying & Curing</div><div class="step-detail">The printed dial cures — either air-dried or oven-cured depending on the ink system. UV-curable inks can be set in seconds; solvent inks require longer drying. Full cure time determines durability and scratch resistance.</div></div></div>
+    <div class="step-item"><div class="step-num">6</div><div class="step-body"><div class="step-title">Multi-Colour Builds</div><div class="step-detail">Multiple colours are built up sequentially — each layer requiring its own cliché, pad, and cure cycle. A dial with three printed colours may have been through the machine six or more times. Registration between passes must be precise.</div></div></div>
+    <div class="step-item"><div class="step-num">7</div><div class="step-body"><div class="step-title">Quality Control</div><div class="step-detail">Each dial is inspected — typically under magnification — for print clarity, edge definition, colour consistency, and freedom from defects. High-end manufacturers reject a significant percentage of printed dials at this stage.</div></div></div>
+  </div>
+</div>
+
+<!-- 12 APPLIED MARKERS -->
+<div class="panel" id="p12">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 12 · Indexes</div>
+    <h1><em>Applied</em> Markers &amp; Numerals</h1>
+    <p>When printing is not enough. Three-dimensional hour markers — set into the dial surface — add depth, catch light, and signal quality grade.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <p class="prose">Applied hour markers are positioned on the dial using <strong>precisely drilled locating holes</strong>. Each marker has two pins on its underside that fit into these holes — both locating the position and setting the orientation. The quality of the underlying dial and marker construction determines how they are held in place.</p>
+
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tc-head tch-gold"><span class="tc-num">Premium</span><span class="tc-title">Friction Fit</span></div><div class="tc-body">On high-quality dials, markers are simply pressed in — friction holds them. No adhesive, no secondary retainer. The fit is so precise that no additional fixation is needed.</div></div>
+    <div class="tech-card"><div class="tc-head tch-teal"><span class="tc-num">Mid-Range</span><span class="tc-title">Backing Retainer</span></div><div class="tc-body">A secondary component is attached to the underside of the dial to secure the markers' pins. Still precise positioning, but relying on a mechanical retainer rather than pure friction.</div></div>
+    <div class="tech-card"><div class="tc-head tch-copper"><span class="tc-num">Economy</span><span class="tc-title">Adhesive / Sticker</span></div><div class="tc-body">Economy dials use sticker-type markers, sometimes with added lume. These are least durable and most prone to lifting, peeling, or falling off during case opening.</div></div>
+    <div class="tech-card"><div class="tc-head tch-ink"><span class="tc-num">Repair</span><span class="tc-title">Re-adhesion</span></div><div class="tc-body">Fallen markers can usually be reattached. The adhesive of choice matters critically — see Section 16 on adhesives. Cyanoacrylate (super glue) is never appropriate for this work.</div></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-num">12.1</span><div class="sdiv-line"></div><span class="sdiv-text">Numeral Styles</span></div>
+  <div class="marker-grid">
+    <div class="marker-card"><div class="mk-name">Arabic</div><div class="mk-desc">Hindu-Arabic numerals introduced to Europe via Arab merchants. First appeared on British clocks in the 15th century. Highly legible and versatile.</div></div>
+    <div class="marker-card"><div class="mk-name">Breguet</div><div class="mk-desc">Modified Arabic numerals developed by Abraham-Louis Breguet just before the French Revolution. Calligraphic, elegant, with distinctive cutouts in the numeral forms. Finalised by 1790.</div></div>
+    <div class="marker-card"><div class="mk-name">Roman</div><div class="mk-desc">Dominant until the Late Middle Ages. Either serif (with tails) or sans-serif. Note: early Roman-numeral dials used "IIII" instead of "IV" — a historical quirk that persists on many watches today.</div></div>
+  </div>
+</div>
+
+<!-- 13 MARKER TYPES -->
+<div class="panel" id="p13">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 13 · Indexes</div>
+    <h1>Hour Marker <em>Types</em></h1>
+    <p>From the brutal simplicity of the stick to the baroque geometry of the deltoid — each marker style tells you something about the watch's intended context.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="marker-grid">
+    <div class="marker-card"><div class="mk-name">Baton</div><div class="mk-desc">Rectangular markers. Thinner on dress watches, thicker on sports models. Can be painted on or applied. The most versatile and widely-used marker type.</div></div>
+    <div class="marker-card"><div class="mk-name">Stick</div><div class="mk-desc">Thinner version of the baton. Long, slender profile gives the dial a refined, elegant look. Almost exclusively found in dress watches.</div></div>
+    <div class="marker-card"><div class="mk-name">Dagger / Dauphine</div><div class="mk-desc">Sharp, triangular indices pointing inward or outward. Often faceted to catch light. Refined and formal — virtually exclusive to dress watches.</div></div>
+    <div class="marker-card"><div class="mk-name">Round / Dot</div><div class="mk-desc">Circular markers — highly legible, often luminous. Common in sports watches where easy reading at a glance is paramount.</div></div>
+    <div class="marker-card"><div class="mk-name">Square</div><div class="mk-desc">Uncommon. Most notable example: Tudor Pelagos — square markers combined with arrow at 12 and batons at 6 and 9.</div></div>
+    <div class="marker-card"><div class="mk-name">Diamond</div><div class="mk-desc">Purely aesthetic. Usually combined with diamond bezels and other gem-set elements. Precious stones including rubies and sapphires are also used.</div></div>
+    <div class="marker-card"><div class="mk-name">Tombstone</div><div class="mk-desc">Combination of round and square — an arch-topped rectangle. Found on Seiko Prospex and other sport/tool watch lines.</div></div>
+    <div class="marker-card"><div class="mk-name">Deltoid</div><div class="mk-desc">Kite-shaped, faceted. Related to the dagger style but with a traditional kite form rather than an inverted triangle. The outer tip can be cut flat.</div></div>
+    <div class="marker-card"><div class="mk-name">Middle Eastern</div><div class="mk-desc">Markers specifically adapted for Middle Eastern markets — Arabic script numerals or regionally-specific design conventions.</div></div>
+  </div>
+
+  <div class="callout"><strong>Marker choice signals context:</strong> Dagger, stick, and Breguet numerals = dress watch. Round dots and bold batons = sports watch. Diamond markers = jewellery watch. Understanding this vocabulary lets you read a watch's intended purpose before looking at any other feature.</div>
+</div>
+
+<!-- 14 CLEANING -->
+<div class="panel" id="p14">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 14 · Restoration</div>
+    <h1>Cleaning <em>Watch Dials</em></h1>
+    <p>The most consequential operation in watch restoration. One wrong decision and the dial is ruined forever. Restraint is the primary skill.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="warn-box"><span class="warn-icon">⚠</span><div class="warn-text"><strong>Rule #1 — Absolute:</strong> Never clean a watch dial in an ultrasonic machine or spinning basket machine. This will always remove the printed ink from the dial. No exceptions.</div></div>
+
+  <div class="warn-box"><span class="warn-icon">⚠</span><div class="warn-text"><strong>Rule #2:</strong> Avoid all solvents unless you are trained and understand the specific dial type — enamel, painted, printed, lacquered — and the precise effect of that solvent on that dial. Solvents can destroy a finish in seconds.</div></div>
+
+  <div class="sdiv"><span class="sdiv-num">14.1</span><div class="sdiv-line"></div><span class="sdiv-text">Dust Removal</span></div>
+  <div class="step-list">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-title">Soft Brush</div><div class="step-detail">Use a clean, soft brush (natural hair preferred) to gently sweep visible dust or particles from the dial surface. Move from centre outward. Do not press — the bristles do the work.</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-title">Blower Bulb</div><div class="step-detail">Gently squeeze a rubber air blower to direct clean air across the dial surface. This lifts fine particles that the brush cannot reach. Never use canned compressed air — the pressure is too high and it can leave propellant residue.</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-title">Rodico — Caution</div><div class="step-detail">Rodico putty should generally NOT be used on watch dials. It leaves a residue that attracts further dust. Use only on metal surfaces away from the printed or painted areas, and with great care.</div></div></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-num">14.2</span><div class="sdiv-line"></div><span class="sdiv-text">Cleaning Grime — Careful Method</span></div>
+  <div class="callout copper"><strong>Important:</strong> What appears to be dirt or grime on an old dial is often patina. Removing patina will ruin the dial. Only attempt to clean genuine grime — and test on the outer edge first.</div>
+
+  <div class="step-list">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-title">Use a foam surgical swab — not cotton</div><div class="step-detail">Cotton swabs can leave fibres on the dial and the cotton tip can snag on applied markers. A foam surgical swab has a smooth, clean tip that releases no debris.</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-title">Moisten with distilled water only</div><div class="step-detail">Lightly dampen the swab in distilled water — not tap water (mineral residues), not IPA (solvent risk). The swab should be barely moist, not wet.</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-title">Start at the outer edge — test first</div><div class="step-detail">Begin on the outermost rim of the dial and watch closely. Is any ink lifting? Are the printed minute marks remaining intact? If everything is clean and unaffected, carefully move inward.</div></div></div>
+    <div class="step-item"><div class="step-num">4</div><div class="step-body"><div class="step-title">Roll — never scrub</div><div class="step-detail">Roll the swab lightly over the surface. Do not scrub or rub. The rolling motion lifts grime without applying lateral shear force that could disturb printed ink or lume.</div></div></div>
+    <div class="step-item"><div class="step-num">5</div><div class="step-body"><div class="step-title">Optional: dilute Liquinox</div><div class="step-detail">A dilute solution of Liquinox (2½ tablespoons per gallon of distilled or deionized water) can be used for stubborn grime. Follow immediately with a distilled water pass to remove any detergent residue.</div></div></div>
+  </div>
+</div>
+
+<!-- 15 DIAL FEET REPAIR -->
+<div class="panel" id="p15">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 15 · Restoration</div>
+    <h1>Repairing <em>Dial Feet</em></h1>
+    <p>A broken dial foot does not mean a ruined dial. With the right tools and process, a new foot can be soldered on cleanly — and the repair is invisible from the front.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <p class="prose">Dial feet hold the dial securely to the movement. They are a common casualty of case openings and movement extractions. The goal is to create a new foot soldered to the back of the dial, positioned precisely in the original location, without damaging the dial face.</p>
+
+  <div class="step-list">
+    <div class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-title">File the broken foot flush</div><div class="step-detail">Use a fine flat file (number 4 cut or finer) to file the broken dial foot completely flush with the back of the dial. Work carefully — do not rock the file, which could scratch the dial edge.</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-title">Level the area with 400-grit sandpaper</div><div class="step-detail">Wrap the end of the file with 400-grit sandpaper and level the filed area until it is perfectly flat. The surface needs to be truly flat for a solid solder bond.</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-body"><div class="step-title">Locate the centre precisely</div><div class="step-detail">Install the dial on the main plate and tighten the screw on the existing (intact) foot. Use a jewelling set fitted with a reaming bit centred in the hole for the broken foot and give it a couple of turns. This marks the exact centre position in the back of the dial without guessing.</div></div></div>
+    <div class="step-item"><div class="step-num">4</div><div class="step-body"><div class="step-title">Prepare the copper wire foot</div><div class="step-detail">Hold copper wire in a pin vise and file the end flat. Lightly break the edges (a tiny chamfer) so the solder can flow cleanly. Test the fit of the wire against the recess in the dial back before proceeding.</div></div></div>
+    <div class="step-item"><div class="step-num">5</div><div class="step-body"><div class="step-title">Apply flux and position solder</div><div class="step-detail">Dip the end of the wire in flux. Position the wire in the marked location and secure with an alligator clip. Squeeze solder flat and break off small pieces with tweezers. Place a couple of pieces of solder at the joint, ensuring everything is correctly aligned before heat is applied.</div></div></div>
+    <div class="step-item"><div class="step-num">6</div><div class="step-body"><div class="step-title">Solder with a dial foot soldering tool</div><div class="step-detail">A specialised soldering tool (not a standard soldering iron) is used — the iode touches the copper wire only. Just enough current flows through the copper to melt the solder at the joint without transmitting damaging heat to the dial face. Pull on the wire to verify the solder is holding before cooling.</div></div></div>
+    <div class="step-item"><div class="step-num">7</div><div class="step-body"><div class="step-title">Cut to length — finish with Bergeon mill</div><div class="step-detail">Cut the foot to the correct length. A Bergeon dial foot mill — a hand tool with a centre hole that the foot fits through — trims the foot to the correct length and cuts the excess solder flush with the dial back in a single smooth operation. No filing, no risk of gouging.</div></div></div>
+  </div>
+
+  <div class="callout teal"><strong>Why copper wire?</strong> Copper conducts the soldering current evenly from the iode tip to the joint, making the specialised dial foot soldering tool effective. It also has a compatible coefficient of thermal expansion with typical dial bases (brass), reducing stress at the joint over time.</div>
+</div>
+
+<!-- 16 ADHESIVES & DIAL DOTS -->
+<div class="panel" id="p16">
+  <div class="ph">
+    <div class="ph-eyebrow">Chapter 16 · Restoration</div>
+    <h1>Adhesives &amp; <em>Dial Dots</em></h1>
+    <p>Re-adhering fallen markers. The adhesive you choose matters more than most watchmakers realise — get it wrong and your next problem will be much worse than a loose marker.</p>
+    <div class="ph-rule"></div>
+  </div>
+
+  <div class="warn-box"><span class="warn-icon">⚠</span><div class="warn-text"><strong>Never use cyanoacrylate (super glue) on watch dials.</strong> Cyanoacrylate continues to off-gas long after the watch has been reassembled and sealed in its case. The vapour attacks the dial surface, applied markers, and even the crystal, causing frosting and permanent damage. The damage may not appear for months — after the watch has been returned to the customer.</div></div>
+
+  <div class="sdiv"><span class="sdiv-num">16.1</span><div class="sdiv-line"></div><span class="sdiv-text">Recommended Adhesives for Marker Repair</span></div>
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tc-head tch-gold"><span class="tc-num">★</span><span class="tc-title">Liquid Shellac</span></div><div class="tc-body">The preferred choice. Shellac is a natural resin with a long history in fine instrument work. It does not off-gas, adheres well to metal, and can be released with gentle heat if the marker needs repositioning.</div></div>
+    <div class="tech-card"><div class="tc-head tch-teal"><span class="tc-num">✓</span><span class="tc-title">GS Hypo Glue</span></div><div class="tc-body">A watchmaker-specific adhesive that is safe for use inside watch cases. Formulated not to produce vapours that could damage dial surfaces or crystals. A reasonable alternative where shellac is impractical.</div></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-num">16.2</span><div class="sdiv-line"></div><span class="sdiv-text">Application Method</span></div>
+  <div class="step-list">
+    <div class="step-item"><div class="step-num">A</div><div class="step-body"><div class="step-title">Markers with pins — glue from the underside</div><div class="step-detail">When working with markers that have locating pins that fit into holes in the dial, it is always best to apply adhesive from the underside of the dial — through the hole into the pin. This keeps any adhesive away from the visible dial surface and any luminous material.</div></div></div>
+    <div class="step-item"><div class="step-num">B</div><div class="step-body"><div class="step-title">Markers without pins — sharpened toothpick under magnification</div><div class="step-detail">Where a marker has no pins (e.g., a simple flat applied element), adhesive application must be done with a sharpened toothpick under high magnification. The goal is to apply the minimum quantity necessary at the marker base — ideally invisible when viewed from the front. Any excess adhesive that migrates onto the dial surface will be catastrophically visible.</div></div></div>
+  </div>
+
+  <div class="sdiv"><span class="sdiv-num">16.3</span><div class="sdiv-line"></div><span class="sdiv-text">Dial Dots</span></div>
+  <p class="prose"><strong>Dial dots</strong> are another method for attaching dials to movements — small adhesive pads positioned between the dial and movement. They are <strong>generally frowned upon</strong> by professional watchmakers and have limited appropriate use cases. Their use depends heavily on whether spacers are present between the dial and any complications located on the dial side of the movement. In most cases, a dial with correctly intact feet properly secured in the movement's dial foot retainers is always preferable to a dial dot solution.</p>
+  <div class="callout copper"><strong>Dial dots should be a last resort</strong> — used when the original foot attachment system is genuinely impractical to repair. A dial held by dots alone is insecure and may shift position, potentially causing hand-to-dial contact. Always repair feet properly when possible.</div>
+</div>
+
+</main>
+</div>
+
+<script>
+function nav(el, id) {
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+  if (window.innerWidth <= 800) document.querySelector('.sidebar').classList.remove('open');
+  document.querySelector('.main').scrollTop = 0;
+}
+</script>
+</body>
+</html>
